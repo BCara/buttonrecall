@@ -259,7 +259,7 @@ const Game = {
         sessionAttributes.scores, sessionAttributes.playerCount);
 
       let messageKey = sessionAttributes.STATE === settings.STATE.BUTTON_GAME_STATE ?
-        'GAME_FINISHED_INTRO' : 'SINGLE_PLAYER_GAME_FINISHED_INTRO';
+        'GAME_FINISHED_INTRO' : 'SINGLE_PLAYER_GAME_FINISHED_INTRO'; //REMOVE SINGLE PLAYER
       let gameFinishedMessageAttributes = ctx.t(messageKey);
 
       // Give a pause if there is nothing to say before the summary
@@ -335,21 +335,36 @@ const Game = {
           // Capture that info in the attributes to be used later
           sessionAttributes.answeringButton = player.buttonId;
           sessionAttributes.answeringPlayer = player.count;
+          let buttonArray = sessionAttributes.buttonArray;
+          let buttonCheck = gameEngineEvents[0].inputEvents[0].gadgetId;
 
-          let responseMessage = ctx.t('BUZZ_IN_DURING_PLAY', {
-            player_number: player.count
-          });
 
+
+          let responseMessage = ""//ctx.t('PLAYERCOUNT_INVALID')
+            
           // Figure out who the other players were so we can shut off their buttons
           var otherPlayers = sessionAttributes.buttons
             .filter(b => b.buttonId != gameEngineEvents[0].inputEvents[0].gadgetId)
             .map(b => b.buttonId);
 
           // Send directive to clear animations & restore defaults on the other players buttons
-          Game.resetAnimations(handlerInput, otherPlayers);
+          //Game.resetAnimations(handlerInput, otherPlayers);
+          if (buttonArray[0] === buttonCheck) {
+            logger.debug('T_MATCH')
+
+          responseMessage = ctx.t('CORRECT_BUTTON_SEQUENCE_PLAY');
+          Game.startMemoryGame(handlerInput);
+
+          } else {
+            logger.debug('T_NOMATCH');
+            responseMessage = ctx.t('INCORRECT_BUTTON_SEQUENCE_PLAY');
+          }
+          logger.debug('button array: ' + buttonArray[0] + ' button check: ' + buttonCheck)
+
+
 
           // Build the response
-          ctx.outputSpeech.push(settings.AUDIO.BUZZ_IN_AUDIO);
+          //ctx.outputSpeech.push(settings.AUDIO.BUZZ_IN_AUDIO);
           ctx.outputSpeech.push(responseMessage.outputSpeech);
           ctx.reprompt.push(responseMessage.reprompt);
           ctx.openMicrophone = true;
@@ -371,18 +386,20 @@ const Game = {
         }
       case 'answer_interstitial_event':
         {
-          let questions = ctx.t('QUESTIONS');
-          let currentQuestion = parseInt(sessionAttributes.currentQuestion || 1, 10);
-          let shuffledQuestionIndex = sessionAttributes.orderedQuestions[currentQuestion - 1];
-          let triviaQuestion = questions.find(q => q.index == shuffledQuestionIndex);
+          //let questions = ctx.t('QUESTIONS');
+         // let currentQuestion = parseInt(sessionAttributes.currentQuestion || 1, 10);
+         // let shuffledQuestionIndex = sessionAttributes.orderedQuestions[currentQuestion - 1];
+         // let triviaQuestion = questions.find(q => q.index == shuffledQuestionIndex);
 
-          let responseMessage = ctx.t('ASK_QUESTION_DISPLAY', {
-            question_number: currentQuestion
-          });
-          responseMessage.displayText = triviaQuestion.question;
+          let responseMessage = ctx.t('PLAYERCOUNT_INVALID')//, {
+           // question_number: currentQuestion
+         // });
+         // responseMessage.displayText = triviaQuestion.question;
           ctx.render(handlerInput, responseMessage);
 
-          Game.listenForAnswer(handlerInput);
+          Game.answerMemoryGame(handlerInput);
+
+          //Game.listenForAnswer(handlerInput);
           return;
         }
       default:
@@ -600,7 +617,306 @@ const Game = {
    * Function to gather the built responses, add them to the overall response and handle the
    * logic of retrieving and asking the next/same question depending on if the user got it right.
    */
-  askQuestion: function (handlerInput, isFollowingAnswer) {
+
+
+
+
+  startMemoryGame: function (handlerInput) {
+      logger.debug('GAME: answer Memory Game');
+        let {
+      requestEnvelope,
+      attributesManager
+    } = handlerInput;
+      let sessionAttributes = attributesManager.getSessionAttributes();
+      let ctx = attributesManager.getRequestAttributes();
+    let buttons = sessionAttributes.buttons;
+    let buttonArray = sessionAttributes.buttonArray || [];
+    let sequenceLength = buttonArray.length
+
+
+    let buttonSelect = settings.randomButton(buttons.length)
+    let buttonSelectId = buttons[buttonSelect].buttonId
+    buttonArray[buttonArray.length] = buttonSelectId;
+    sessionAttributes.buttonArray = buttonArray
+
+
+   // for (var i = 1; i < 2; i++) {
+     //     Game.lightButtons(handlerInput, i);
+    //}
+
+
+
+
+    Game.myTest(handlerInput);
+  
+
+
+
+
+
+
+
+
+
+   
+
+    //Game.lightButtons(handlerInput);
+
+  //  for (var i = 0; i < buttonArray.length; i++) {
+
+        //await sleep(1000)
+    //}
+
+          let interstitialDelay = 3000;
+       //Game.animateButtonsAfterAnswer(handlerInput);
+      // Game.sendAnswerInterstitial(handlerInput, interstitialDelay);
+
+      
+
+      let messageKey = 'PLAY_GAME_GO'
+      let responseMessage = ctx.t(messageKey);
+        ctx.outputSpeech.push(responseMessage.outputSpeech);
+        ctx.reprompt.push(responseMessage.reprompt);
+        ctx.openMicrophone = true;
+      ctx.render(handlerInput, responseMessage);
+
+  },
+
+      myTest: function () {
+             logger.debug('GAME: My Test');
+        let {
+      requestEnvelope,
+      attributesManager
+    } = handlerInput;
+    let sessionAttributes = attributesManager.getSessionAttributes();
+    let ctx = attributesManager.getRequestAttributes();
+
+    let buttonArray = sessionAttributes.buttonArray;
+    let sequenceLength = buttonArray.length
+
+    //sessionAttributes.buttonArray || [];
+
+
+    //let buttonSelectId = buttons[buttonSelect].buttonId
+
+        
+    logger.debug('button array length: ' + buttonArray.length);
+    
+    
+    logger.debug('Buttons length = ' + buttons.length + 'random button ' + buttonArray[0])
+    let buttonOneColorSequence = [];
+    let buttonTwoColorSequence = [];
+    let buttonThreeColorSequence = [];
+    let buttonFourColorSequence = [];
+
+          for (let i = 0; i < sequenceLength; i++) {
+
+            if (buttonArray[i] == buttons[0].buttonId) {
+              buttonOneColorSequence.push({
+                "durationMs": 3000,
+                "color": "000000",
+                "blend": false
+              });
+
+           } else {
+              buttonOneColorSequence.push({
+                "durationMs": 3000,
+                "color": "00FF00",
+                "blend": false
+              });
+
+            }
+
+                        if (buttonArray[i] == buttons[1].buttonId) {
+              buttonTwoColorSequence.push({
+                "durationMs": 3000,
+                "color": "000000",
+                "blend": false
+              });
+
+           } else {
+              buttonTwoColorSequence.push({
+                "durationMs": 3000,
+                "color": "00FF00",
+                "blend": false
+              });
+
+            }
+    }
+          
+      ctx.directives.push(directives.GadgetController.setIdleAnimation({
+            'targetGadgets': [buttons[0].buttonId],
+        'animations':  
+                  [
+              {
+                "repeat": 1,
+                "targetLights": [ 
+                  "1"
+                ],
+
+                "sequence": buttonOneColorSequence
+              }
+              ]
+                            
+
+      }));
+
+      ctx.directives.push(directives.GadgetController.setIdleAnimation({
+            'targetGadgets': [buttons[1].buttonId],
+        'animations':  
+                  [
+              {
+                "repeat": 1,
+                "targetLights": [ 
+                  "1"
+                ],
+
+                "sequence": buttonTwoColorSequence
+              }
+              ]
+                            
+
+      }));
+
+   /*   ctx.directives.push(directives.GadgetController.setIdleAnimation({
+            'targetGadgets': [buttons[0].buttonId],
+        'animations':  
+                  [
+              {
+                "repeat": 1,
+                "targetLights": [ 
+                  "1"
+                ],
+
+                "sequence": colorSequence
+              }
+              ]
+                            
+
+      }));
+
+      ctx.directives.push(directives.GadgetController.setIdleAnimation({
+            'targetGadgets': [buttons[0].buttonId],
+        'animations':  
+                  [
+              {
+                "repeat": 1,
+                "targetLights": [ 
+                  "1"
+                ],
+
+                "sequence": colorSequence
+              }
+              ]
+                            
+
+      })); */
+
+
+    
+
+    },
+
+
+
+    lightButtons: function (handlerInput, i) {
+      logger.debug('GAME: answer Memory Game');
+        let {
+      requestEnvelope,
+      attributesManager
+    } = handlerInput;
+      let sessionAttributes = attributesManager.getSessionAttributes();
+      let ctx = attributesManager.getRequestAttributes();
+
+    let buttons = sessionAttributes.buttons;
+    let buttonSelect = settings.randomButton(buttons.length)
+    let buttonSelectId = buttons[i].buttonId
+    //let buttonSelectId = buttons[buttonSelect].buttonId
+
+        let buttonArray = sessionAttributes.buttonArray || [];
+    logger.debug('button array length: ' + buttonArray.length);
+    buttonArray[buttonArray.length] = buttonSelectId;
+    sessionAttributes.buttonArray = buttonArray
+    logger.debug('Buttons length = ' + buttons.length + 'random button ' + buttonArray[0])
+
+      ctx.directives.push(directives.GadgetController.setIdleAnimation({
+            'targetGadgets': [buttonSelectId],
+        'animations': settings.ANIMATIONS.ROLL_CALL_CHECKIN_ANIMATION
+      }));
+ 
+    },
+
+    answerMemoryGame: function (handlerInput) {
+       logger.debug('GAME: answer Memory Game');
+        let {
+      requestEnvelope,
+      attributesManager
+    } = handlerInput;
+    let sessionAttributes = attributesManager.getSessionAttributes();
+    let ctx = attributesManager.getRequestAttributes();
+ 
+
+    //let buttonPressed = inputEvent.inputEvents[0].gadgetId;
+    let buttonArray = sessionAttributes.buttonArray;
+
+
+
+    sessionAttributes.inputHandlerId = requestEnvelope.request.requestId;
+    sessionAttributes.waitingForAnswer = true;
+    ctx.openMicrophone = false;
+
+    // create a list of proxies of the same length as the number of buttons we're trying to match
+    let gadgetIds = sessionAttributes.buttons.map((b, i) => b.buttonId);
+
+    // Remove buttons that have answered this question incorrectly
+    gadgetIds = gadgetIds.filter(gadgetId => !sessionAttributes.incorrectAnswerButtons ||
+      !sessionAttributes.incorrectAnswerButtons.includes(gadgetId));
+
+    logger.debug(gadgetIds);
+
+    ctx.directives.push(directives.GameEngine.startInputHandler({
+      'timeout': 25000,
+      'recognizers': {
+        'any_button_buzz_in': {
+          "type": "match",
+          "fuzzy": false,
+          "anchor": "start",
+          "gadgetIds": gadgetIds,
+          "pattern": [{
+            "action": "down"
+          }]
+        }
+      },
+      'events': {
+        'button_down_event': {
+          'meets': ['any_button_buzz_in'],
+          'reports': 'matches',
+          'shouldEndInputHandler': true,
+          'maximumInvocations': 1
+        },
+        'time_out_event': {
+          'meets': ['timed out'],
+          'reports': 'history',
+          'shouldEndInputHandler': true
+        }
+      }
+    }));
+
+    // Send Button Down Event
+    ctx.directives.push(directives.GadgetController.setButtonDownAnimation({
+      'targetGadgets': gadgetIds,
+      'animations': settings.ANIMATIONS.BUZZ_IN_ANIMATION
+    })); 
+
+    // everyone gets the same animations
+    ctx.directives.push(directives.GadgetController.setIdleAnimation({
+      'targetGadgets': gadgetIds,
+      'animations': settings.ANIMATIONS.LISTEN_FOR_ANSWER_ANIMATION
+    }));
+
+
+    },
+    askQuestion: function (handlerInput, isFollowingAnswer) {
     let {
       requestEnvelope,
       attributesManager

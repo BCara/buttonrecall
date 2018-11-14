@@ -253,14 +253,14 @@ const ComplexAnimations = {
     for (let i = 0; i < color.length; i++) {
 
       colorSequence.push({
-        "durationMs": 400,
+        "durationMs": 3000,
         "color": ColorHelper.validateColor(color[i]),
         "blend": true
       });
     }
     return [
       {
-        "repeat": cycles,
+        "repeat": 1,
         "targetLights": ["1"],
         "sequence": colorSequence
       }

@@ -265,7 +265,7 @@ const rollCallHelper = {
         return;
       }
     }
-
+    
     let buttonNumber = buttons.length + 1;
     logger.debug('Found a new button. New button number: ' + buttonNumber);
     buttons.push({
@@ -273,6 +273,9 @@ const rollCallHelper = {
       buttonId: buttonId
     });
     sessionAttributes.buttons = buttons;
+    let deviceId = sessionAttributes.deviceId || [];
+    deviceId = buttonId;
+    sessionAttributes.deviceId = deviceId;
 
     rollCallHelper.handlePlayerCheckedIn(handlerInput, buttonId, buttons.length);
   },

@@ -117,22 +117,22 @@ const startHandlers = {
         parseInt(requestEnvelope.request.intent.slots.players.value, 10) : 0;
 
       let validPlayerCount = sessionAttributes.playerCount &&
-        (sessionAttributes.playerCount <= settings.GAME.MAX_PLAYERS) && (sessionAttributes.playerCount > 0);
+        (sessionAttributes.playerCount <= settings.GAME.MAX_PLAYERS) && (sessionAttributes.playerCount > 1);
 
       if (validPlayerCount){
-        if (sessionAttributes.playerCount === 1){
+        //if (sessionAttributes.playerCount === 1){
           // Play a buttonless game
-          sessionAttributes.STATE = settings.STATE.BUTTONLESS_GAME_STATE;
+          //sessionAttributes.STATE = settings.STATE.BUTTONLESS_GAME_STATE;
 
-          let responseMessage = ctx.t('SINGLE_PLAYER_GAME_READY');
-          ctx.render(handlerInput, responseMessage);
-          ctx.outputSpeech.push(settings.AUDIO.ROLL_CALL_COMPLETE);
-          ctx.outputSpeech.push(responseMessage.outputSpeech);
-          ctx.reprompt.push(responseMessage.reprompt);
-          ctx.openMicrophone = true;
-        } else {
+          //let responseMessage = ctx.t('SINGLE_PLAYER_GAME_READY');
+          //ctx.render(handlerInput, responseMessage);
+          //ctx.outputSpeech.push(settings.AUDIO.ROLL_CALL_COMPLETE);
+          //ctx.outputSpeech.push(responseMessage.outputSpeech);
+          //ctx.reprompt.push(responseMessage.reprompt);
+          //ctx.openMicrophone = true;
+        //} else {
           RollCall.start(handlerInput, false, sessionAttributes.playerCount);
-        }
+        //}
       } else {
         let responseMessage = ctx.t('PLAYERCOUNT_INVALID');
         ctx.outputSpeech.push(responseMessage.outputSpeech);
@@ -210,25 +210,25 @@ const startHandlers = {
       let ctx = attributesManager.getRequestAttributes();
 
       let validPlayerCount = sessionAttributes.playerCount &&
-        sessionAttributes.playerCount <= settings.GAME.MAX_PLAYERS && sessionAttributes.playerCount > 0;
+        sessionAttributes.playerCount <= settings.GAME.MAX_PLAYERS && sessionAttributes.playerCount > 1;
 
       if (validPlayerCount) {
         logger.debug('Resume roll call. We know the number of players: ' + sessionAttributes.playerCount);
 
-        if (sessionAttributes.playerCount === 1){
+        //if (sessionAttributes.playerCount === 1){
           // Play a buttonless game
-          sessionAttributes.STATE = settings.STATE.BUTTONLESS_GAME_STATE;
+          //sessionAttributes.STATE = settings.STATE.BUTTONLESS_GAME_STATE;
 
-          let responseMessage = ctx.t('SINGLE_PLAYER_GAME_READY');
-          ctx.render(handlerInput, responseMessage);
-          ctx.outputSpeech.push(settings.AUDIO.ROLL_CALL_COMPLETE);
-          ctx.outputSpeech.push(responseMessage.outputSpeech);
-          ctx.reprompt.push(responseMessage.reprompt);
-          ctx.openMicrophone = true;
-        } else {
+          //let responseMessage = ctx.t('SINGLE_PLAYER_GAME_READY');
+          //ctx.render(handlerInput, responseMessage);
+          //ctx.outputSpeech.push(settings.AUDIO.ROLL_CALL_COMPLETE);
+          //ctx.outputSpeech.push(responseMessage.outputSpeech);
+          //ctx.reprompt.push(responseMessage.reprompt);
+          //ctx.openMicrophone = true;
+        //} else {
           let resumingGame = (sessionAttributes.buttons && sessionAttributes.buttons.length === sessionAttributes.playerCount);
           RollCall.start(handlerInput, resumingGame, sessionAttributes.playerCount);
-        }
+        //}
       } else {
         logger.debug('Resuming roll call, but starting from scratch!');
 

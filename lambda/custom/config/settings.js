@@ -44,6 +44,7 @@ module.exports = (function () {
    *          was if everyone has answered incorrectly
    */
   const GAME_OPTIONS = {
+    MIN_BUTTONS: 2,
     MAX_PLAYERS: 4,
     QUESTIONS_PER_GAME: 6,
     QUESTIONS_PER_ROUND: 2,
@@ -171,7 +172,7 @@ module.exports = (function () {
 
     // ** Roll Call Complete Animation - displays on all buttons in play
     'ROLL_CALL_COMPLETE_ANIMATION': animations.ComplexAnimations
-      .SpectrumAnimation(6, ['red', 'orange', 'green', 'yellow', 'white']),
+      .SpectrumAnimation(1, ['red', 'orange', 'green', 'yellow', 'white']),
 
     // ** Roll Call Check-In Animation - buttons change state when added via roll call.
     'ROLL_CALL_CHECKIN_ANIMATION': animations.BasicAnimations
@@ -233,6 +234,11 @@ module.exports = (function () {
         return arry[Math.floor(Math.random() * Math.floor(arry.length))]
       }
       return arry;
+    },
+    randomButton(noOfButtons) {
+      
+        return (Math.floor(Math.random() * noOfButtons))
+      
     }
   });
 })();

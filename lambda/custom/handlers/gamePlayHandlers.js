@@ -109,7 +109,8 @@ const gamePlayHandlers = {
     handle(handlerInput) {
       logger.debug('GAME.YesHandler: handle');
 
-      Game.askQuestion(handlerInput, false);
+      //Game.askQuestion(handlerInput, false);
+      Game.startMemoryGame(handlerInput);
       return handlerInput.responseBuilder.getResponse();
     }
   },
